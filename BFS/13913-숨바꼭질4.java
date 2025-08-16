@@ -1,99 +1,58 @@
-/**
-시작시간: ‎2025‎년 ‎8‎월 ‎11‎일 ‎월요일, ‏‎오전 8:10:13
-중간종료: 
-
-/ 중간 점검 / 
-이전 값 배열 만들고 추적하는게 더 효율적 (추후 구현)
-visit[], previous[]
-
-*/
 import java.io.*;
 import java.util.*;
 
-class Main {
-	//수빈 0~100_000
-	//동생 0~100_000
-	//최대 100_000  int 범위 안
-	static int subinPos;
-	static int youngPos;
-	static class Path {
+public class Main {
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+
+        int start = Integer.parseInt(st.nextToken());
+        int target = Integer.parseInt(st.nextToken());
+
+        if (start == target) {
+            System.out.println(0);
+            System.out.println(start);
+            return;
+        }
+
+        int[] dist = new int[100_000 + 1];
+        int[] prev = new int[100_000 + 1];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        Arrays.fill(prev, Integer.MAX_VALUE);
+
+        ArrayDeque<Integer> q = new ArrayDeque<>();
+        q.add(start);
+        dist[start] = 0;
+
+        while (!q.isEmpty()) {
+            int cur = q.poll();
+
+            int[] nexts = {cur - 1, cur + 1, cur * 2};
+            for (int nx : nexts) {
+                if (nx < 0 || nx > MAX) continue;
+				
+                dist[nx] = dist[cur] + 1;
+                prev[nx] = cur;
+                q.add(nx);
+
+                if (nx == target) 
+                    q.clear();
+                    break;
+                }
+            }
+        }
+
 		LinkedList<Integer> path = new LinkedList<>();
-		int dist = Integer.MAX_VALUE;
-		int pos;
-	}
-	
-	static Queue<Path> q = new ArrayDeque<>();
-	static Path[] pathArr = new Path[100_001];
-	
-	public static void main(String[] args) throws Exception {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		int[] input = Arrays.stream(br.readLine().split(" "))
-							  .mapToInt(Integer::parseInt)
-							  .toArray();
-		subinPos = input[0];
-		youngPos = input[1];
-		solve(subinPos, youngPos);
-	}
-	
-	static String[] solve(int start, int target){
-		Path init = new Path();
-		pathArr[start] = init;
-		init.path.add(start);
-		init.dist = 0;
-		init.pos = start;
-		q.add(init);
-		
-		while(!q.isEmpty()){
-			Path cur = q.poll();
-			if(cur.pos == target){
-				break;
-			}
-			for(int i=0; i<3; i++){
-				int next = nextPos(i, cur.pos);
-				if(!validPos(next)){
-					continue;
-				}
-				
-				if(pathArr[next] == null){
-					pathArr[next] = new Path();
-					pathArr[next].path = cur.path.clone();
-				}
-				
-				if(pathArr[next].dist > pathArr[cur].dist + 1){
-					pathArr[next].dist = pathArr[cur].dist + 1;
-					q.add(pathArr[next]);
-				}
-			}
+		for (int v = target; v != Integer.MAX_VALUE; v = prev[v]) {
+			path.addFirst(v);
 		}
 		
-		String[] = new String[2];
-		String[0] = String.valueOf(pathArr[target].dist); //dist
-		
-		StringBuilder st = new StringBuilder();
-		for(Integer i : pathArr[target].path){
-			st.append(String.valueOf(pathArr[target].dist)).append(" ");
-		}
-		
-		String[1] = st; //path;
-	
-		
-	}
-	
-	static int nextPos(int code, int cur){
-		if(code == 0){ // Telpo
-			return cur * 2;
-		}
-		
-		if(code == 1) { // walkUp
-			return cur + 1;
-		}
-		if(code == 2) { // walkDown
-			return cur - 1;
-		}
-		return -1;
-	}
-	
-	static boolean validPos(int pos){
-		return -1 < pos && pos < 100_001;
-	}
+        StringBuilder sb = new StringBuilder();
+		sb.append(dist[target]).append("\n");
+        for (int i = 0; i < path.size(); i++) {
+            if (i > 0) sb.append(' ');
+            sb.append(path.get(i));
+        }
+        System.out.println(sb);
+    }
 }
